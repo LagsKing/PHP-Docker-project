@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+    httpd:
+        build:
+            context: ./httpd/
+            args:
+                WERSJA_HTTPD: 2.4
+        networks:
+            backend:
+                ipv4_address: 172.0.0.1
+            frontend:
+                ipv4_address: 172.0.1.1
+        ports:
+            - 8080:80
+        volumes:
+            - ${WOLUMEN_HTTPD_PHP}:/var/www/html
+        depends_on:
+            - php
+        container_name: httpd
+        
+    mysql:
+        build: 
+            context: ./mysql/
+            args:
+                WERSJA_MYSQL: 8.0
+        command:
+            - mysqld
+        restart: always
+        ports:
+            - 3306:3306
+        volumes:
+            - ${WOLUMEN_MYSQL}:/var/lib
+        networks:
+            backend:
+                ipv4_address: 172.0.0.2
+        environment:
+            MYSQL_HOST: ${MYSQL_HOST}
+            MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+        container_name: mysql
+        
+    php:
+        build:
+            context: ./php/
+            args:
+                WERSJA_PHP: 8.0
+        networks:
+            backend:
+                ipv4_address: 172.0.0.3
+        ports:
+            - 9000:9000
+        volumes:
+            - ${WOLUMEN_HTTPD_PHP}:/var/www/html/
+        environment:
+            MYSQL_HOST: ${MYSQL_HOST}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+        restart: always
+        container_name: php
+
+networks:
+    backend:
+        driver: bridge
+        ipam:
+            config:
+                -
+                    subnet: "172.0.0.0/24"
+                    ip_range: "172.0.0.0/24"
+                    gateway: "172.0.0.254"
+    frontend:
+        driver: bridge
+        ipam:
+            config:
+                -
+                    subnet: "172.0.1.0/24"
+                    ip_range: "172.0.1.0/24"
+                    gateway: "172.0.1.254"
