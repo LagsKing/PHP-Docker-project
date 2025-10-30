@@ -1,22 +1,59 @@
-Projekt składa się z następujących folderów i plików:
-	httpd - folder zawierający konfigurację kontenera 'httpd'
-		Dockerfile - plik Dockerfile budujący obraz kontenera 'httpd'
-		httpd_mod.conf - konfiguracja serwera WWW
-	mysql - folder zawierający konfigurację kontenera 'mysql'
-		Dockerfile - plik Dockerfile budujący obraz kontenera 'mysql'
-	php - folder zawierający konfigurację kontenera 'php'
-		Dockerfile - plik Dockerfile budujący obraz kontenera 'php'
-	wolumen_httpd_php - folder/wolumen podłączony do kontenerów 'httpd' oraz 'php', przechowuje strony WWW oraz skrypty PHP; tworzony automatycznie jeśli go nie ma
-		index.php - strona testująca działanie usługi LAMP
-	wolumen_mysql - folder/wolumen podłączony do kontenera 'mysql', przechowuje zawartość bazy danych; tworzony automatycznie jeśli go nie ma
-	.env - zmienne używane przez plik 'docker-compose.yml'
-	docker-compose.yml - konfiguracja docker-compose
+# Projekt LAMP (PHP + Apache + MySQL) na Docker-Compose
 
-Użyte obrazy bazowe:
-	httpd - httpd:2.4-alpine
-	mysql - mysql:8.0
-	php - php:8.0-fpm-alpine
+Prosta konfiguracja [Docker-Compose](https://docs.docker.com/compose/) do szybkiego uruchomienia środowiska deweloperskiego LAMP (Linux, **A**pache, **M**ySQL, **P**HP).
 
-Uwagi:
-	Zamiast portu 6666, 'httpd' wystawia port 8080, ponieważ port 6666 to jeden z portów używanych przez usługę IRC i jest domyślnie blokowany przez przeglądarki.
-	Połączenie się z serwerem WWW jest możliwe poprzez adresy 'http://localhost:8080/' oraz 'http://172.0.0.1'
+## Struktura Projektu 📂
+
+Projekt wykorzystuje oddzielne kontenery dla każdej usługi (Apache, PHP-FPM, MySQL) i łączy je za pomocą `docker-compose`.
+
+### Wolumeny
+
+* `wolumen_httpd_php`: Współdzielony wolumen dla kontenerów `httpd` oraz `php`. Przechowuje strony WWW i skrypty PHP.
+* `wolumen_mysql`: Wolumen podłączony do kontenera `mysql`. Przechowuje fizyczne pliki bazy danych.
+
+*Uwaga: Oba wolumeny są tworzone automatycznie przez Docker-Compose przy pierwszym uruchomieniu, jeśli nie istnieją.*
+
+---
+
+## Konfiguracja ⚙️
+
+### Użyte Obrazy Bazowe
+
+* **Apache (httpd):** `httpd:2.4-alpine`
+* **MySQL:** `mysql:8.0`
+* **PHP:** `php:8.0-fpm-alpine`
+
+### Zmienne Środowiskowe
+
+W pliku `.env` definiowane są wrażliwe dane, takie jak hasło roota dla bazy MySQL, które są następnie wstrzykiwane do kontenerów przez `docker-compose.yml`.
+
+---
+
+## Uruchomienie 🚀
+
+Upewnij się, że masz zainstalowanego Dockera oraz Docker-Compose.
+
+1.  Sklonuj repozytorium (lub pobierz pliki).
+2.  Przejdź do głównego katalogu projektu.
+3.  Uruchom środowisko w tle:
+
+    ```bash
+    docker-compose up -d
+    ```
+
+Aby zatrzymać i usunąć kontenery:
+
+```bash
+docker-compose down
+```
+Dostęp 🌐
+Po poprawnym uruchomieniu kontenerów, serwer WWW jest dostępny pod adresem:
+
+http://localhost:8080/
+
+Otworzenie tego adresu w przeglądarce powinno wyświetlić stronę index.php (domyślnie phpinfo()).
+
+Uwaga dotycząca portu
+Serwer httpd (Apache) celowo wystawia port 8080 na hoście, a nie port 6666.
+
+Powód: Port 6666 jest powszechnie kojarzony z usługą IRC i jest domyślnie blokowany przez większość nowoczesnych przeglądarek (np. Chrome, Firefox) ze względów bezpieczeństwa. Użycie portu 8080 pozwala uniknąć tego problemu.
