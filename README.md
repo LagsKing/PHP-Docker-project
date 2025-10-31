@@ -52,8 +52,3 @@ Po poprawnym uruchomieniu kontenerów, serwer WWW jest dostępny pod adresem:
 http://localhost:8080/
 
 Otworzenie tego adresu w przeglądarce powinno wyświetlić stronę index.php (domyślnie phpinfo()).
-
-Uwaga dotycząca portu
-Serwer httpd (Apache) celowo wystawia port 8080 na hoście, a nie port 6666.
-
-Powód: Port 6666 jest powszechnie kojarzony z usługą IRC i jest domyślnie blokowany przez większość nowoczesnych przeglądarek (np. Chrome, Firefox) ze względów bezpieczeństwa. Użycie portu 8080 pozwala uniknąć tego problemu.
